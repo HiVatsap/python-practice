@@ -12,7 +12,7 @@ class Calculator:
     def calculate(self, num1, op, num2):
         if op not in self._operations:
             raise ValueError("Invalid operation.")
-        if (op == "/" or op == "%") and num2 == 0:
+        if op in ("/", "%") and num2 == 0:
             raise ZeroDivisionError("Cannot divide by zero.")
 
         return self._operations[op](num1, num2)
@@ -22,6 +22,8 @@ class Calculator:
 
 
 def get_input(prompt):
+    """ Get user input and check for exit command. """
+
     value = input(prompt).strip()
     if value.lower() == "q":
         print("Goodbye!")
@@ -30,6 +32,8 @@ def get_input(prompt):
 
 
 def parse_number(num):
+    """ Parse a string input into an int or float. """
+
     cleaned = num.strip()
     try:
         val = float(cleaned)
