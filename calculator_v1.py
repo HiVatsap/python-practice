@@ -17,6 +17,17 @@ class Calculator:
 
         return self._operations[op](num1, num2)
 
+    def get_supported_operations(self):
+        return list(self._operations.keys())
+
+
+def get_input(prompt):
+    value = input(prompt).strip()
+    if value.lower() == "q":
+        print("Goodbye!")
+        exit(0)
+    return value
+
 
 def parse_number(num):
     cleaned = num.strip()
@@ -29,36 +40,27 @@ def parse_number(num):
 
 def main():
     calc = Calculator()
+    operations = calc.get_supported_operations()
+
     print("=============== Python Calculator ===============")
-    print(f"Available operations: {', '.join(calc._operations.keys())}.")
+    print(f"Available operations: {', '.join(operations)}.")
     print("Enter 'q' to quit.\n")
 
     while True:
         try:
-            row_num1 = input("Enter a first number: ")
-            if row_num1.strip().lower() == "q":
-                print("Goodbye!")
-                break
+            raw_num1 = get_input("Enter a first number: ")
+            op = get_input("Enter a operation: ")
+            raw_num2 = get_input("Enter a second number: ")
 
-            op = input("Enter a operation: ").strip()
-            if op.strip().lower() == "q":
-                print("Goodbye!")
-                break
-
-            row_num2 = input("Enter a second number: ")
-            if row_num2.strip().lower() == "q":
-                print("Goodbye!")
-                break
-
-            num1 = parse_number(row_num1)
-            num2 = parse_number(row_num2)
+            num1 = parse_number(raw_num1)
+            num2 = parse_number(raw_num2)
 
             result = calc.calculate(num1, op, num2)
 
             print(f"\n{num1} {op} {num2} = {result}\n")
         except (ValueError, ZeroDivisionError) as e:
             print(f"\nError: {e}\n")
-        except not (ValueError, ZeroDivisionError) as e:
+        except Exception as e:
             print(f"\nNot supported error: {e}\n")
 
 
