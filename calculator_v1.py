@@ -34,12 +34,11 @@ def get_input(prompt):
 def parse_number(num):
     """ Parse a string input into an int or float. """
 
-    cleaned = num.strip()
     try:
-        val = float(cleaned)
+        val = float(num)
         return int(val) if val.is_integer() else val
     except ValueError:
-        raise ValueError(f"'{cleaned}' is not a valid number.")
+        raise ValueError(f"'{num}' is not a valid number.")
 
 
 def main():
