@@ -1,8 +1,27 @@
 import math
 from typing import Callable
 
-
 Number = int | float
+
+
+class CalculatorError(Exception):
+    """ Basic class for all calculator errors. """
+    pass
+
+
+class UnsupportedOperationError(CalculatorError):
+    """ Raised when the user tries to use an unsupported operation. """
+    pass
+
+
+class InvalidArgumentError(CalculatorError):
+    """ Raised when the user tries to use an invalid number of arguments. """
+    pass
+
+
+class CalculationError(CalculatorError):
+    """ Raised when the user tries to use an invalid operation. """
+    pass
 
 
 class Calculator:
@@ -22,24 +41,24 @@ class Calculator:
         }
 
     def calculate(self, op: str, *args: Number) -> Number:
-        """Universal function to calculate binary and unary operations."""
+        """ Universal function to calculate binary and unary operations. """
         if op in self._binary_operations:
             if len(args) != 2:
-                raise ValueError(f"Operation {op} requires 2 arguments.")
+                raise InvalidArgumentError(f"Operation '{op}' requires 2 arguments.")
             num1, num2 = args
             if op in ("/", "%") and num2 == 0:
-                raise ZeroDivisionError("Cannot divide by zero.")
+                raise CalculationError("Cannot divide by zero.")
             return self._binary_operations[op](num1, num2)
 
         if op in self._unary_operations:
             if len(args) != 1:
-                raise ValueError(f"Operation {op} requires 1 argument.")
+                raise InvalidArgumentError(f"Operation '{op}' requires 1 argument.")
             num = args[0]
             if op == "sqrt" and num < 0:
-                raise ValueError("'sqrt' operation requires non-negative arguments.")
+                raise CalculationError("'sqrt' operation requires non-negative arguments.")
             return self._unary_operations[op](num)
 
-        raise ValueError(f"'{op}' is not supported.")
+        raise UnsupportedOperationError(f"'{op}' is not supported.")
 
     def is_binary(self, op: str) -> bool:
         return op in self._binary_operations
@@ -100,8 +119,10 @@ def main() -> None:
         except EOFError:
             print("\nGoodbye!")
             break
-        except (ValueError, ZeroDivisionError) as e:
-            print(f"\nError: {e}\n")
+        except CalculatorError as e:
+            print(f"\nCalculation error: {e}\n")
+        except ValueError as e:
+            print(f"\nInput error: {e}\n")
         except Exception as e:
             print(f"\nNot supported error: {e}\n")
 
