@@ -27,6 +27,7 @@ class CalculationError(CalculatorError):
 class Calculator:
     def __init__(self) -> None:
         self.last_result: Number | None = None
+        self._history: list[str] = []
 
         self._binary_operations: dict[str, Callable[[Number, Number], Number]] = {
             "+": lambda a, b: a + b,
@@ -51,6 +52,7 @@ class Calculator:
             if op in ("/", "%") and num2 == 0:
                 raise CalculationError("Cannot divide by zero.")
             result = self._binary_operations[op](num1, num2)
+            self._history.append(f"{num1} {op} {num2} = {result}")
 
         elif op in self._unary_operations:
             if len(args) != 1:
@@ -59,6 +61,7 @@ class Calculator:
             if op == "sqrt" and num < 0:
                 raise CalculationError("'sqrt' operation requires non-negative arguments.")
             result = self._unary_operations[op](num)
+            self._history.append(f"{op}({num}) = {result}")
 
         else:
             raise UnsupportedOperationError(f"'{op}' is not supported.")
@@ -74,6 +77,9 @@ class Calculator:
 
     def get_supported_operations(self) -> list[str]:
         return list(self._binary_operations.keys()) + list(self._unary_operations.keys())
+
+    def get_history(self) -> list[str]:
+        return self._history
 
 
 def get_input(prompt: str) -> str:
@@ -107,11 +113,12 @@ def main() -> None:
     print("=============== Python Calculator ===============")
     print(f"Available operations: {', '.join(operations)}.")
     print("Enter 'ans' to use last result.")
+    print("Enter 'history' to show history.")
     print("Enter 'q' to quit.\n")
 
     while True:
         try:
-            op = get_input("Enter a operation: ")
+            op = get_input("Enter a operation (or 'history'): ")
 
             if calc.is_binary(op):
                 raw_num1 = get_input("Enter first number(or 'ans'): ")
@@ -126,6 +133,12 @@ def main() -> None:
                 num = parse_number(raw_num, calc.last_result)
                 result = calc.calculate(op, num)
                 print(f"\n{op}({num}) = {result}\n")
+
+            elif op.strip().lower() == "history":
+                if calc.get_history():
+                    print(f"\nHistory:\n{'\n'.join(calc.get_history())}\n")
+                else:
+                    print("History is empty.\n")
 
             else:
                 raise ValueError(f"'{op}' is not supported.")
